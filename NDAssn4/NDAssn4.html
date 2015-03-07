@@ -1,0 +1,401 @@
+<!--Revision History: 
+	
+Nicole Dahlquist, 2014.03.25: Created 
+Revised: 2014.03.28, 2014.03.29, 2014.03.30
+Test Plan: 
+Test that form field inputs are accepted into array
+Test validations for empty required fields, cityName length
+Test onBlur functioning, trimInput function
+Test regular expression functionality
+Test focusOrder for errors in fields
+Test functions for capitalizing entire words, and changing words to PascalCase
+Test php array loading, validations, calculations and printing
+-->
+<html>
+	<head>
+		<script type="text/javascript" src="library.js"></script>
+		<script src="jquery.js"></script>
+		<script language="Javascript">
+			// declare global array
+			var varArray = new Array();
+			var orderSummary = "";
+			var orderTotal = 0;
+			
+			// this function loads the text box array
+			// and focuses the first text box, when
+			// the form is loaded
+			window.onload = function()
+			{
+				arrays();
+				varArray[0].focus();
+			}
+			function selection()
+			{
+				var toys=varArray[8].value;
+				var orderTotal = 0;
+				var pricing = document.getElementById("cost");
+				if (toys == "Dolls")
+				{
+					pricing.innerHTML = "<b>     $15 per doll.</b>";
+				}
+				else if (toys == "Trains")
+				{
+					pricing.innerHTML = "<b>     $10 per train.</b>";
+				}
+				else if (toys == "Books")
+				{
+					pricing.innerHTML = "<b>     $5 per book.</b>";
+				}
+				else if (toys == "Dressup Outfits")
+				{
+					pricing.innerHTML = "<b>     $20 per outfit.</b>";
+				}
+				else if (toys == "Board Games")
+				{
+					pricing.innerHTML = "<b>     $25 per game.</b>";
+				}
+			}
+			
+			function arrays()
+			{
+				
+				for (var i = 0; i < 7; i++)
+				{		
+					var fields = "textbox" + i;
+					//document.write(fields);
+					varArray[i] = document.getElementById(fields);
+				}
+				varArray.push(document.getElementById("provinceSelection"));
+				varArray.push(document.getElementById("toySelection"));
+				varArray.push(document.getElementById("orderTextArea"));
+			}
+			
+			/* This function will change the css of the form */
+			$(function(){
+				$("#jQuery").click(function(){
+					$("body").css("background", "url('background.jpg')");
+					$("body").css("font-weight", "bold");
+					$("body").css("color", "white");
+					$("#page").css("background", "black");
+					$("#page").css("width", "40%");
+					$("#page").css("margin", "0 30% 0 15%");
+					$("#page").css("padding", "10% 15% 10% 15%");
+					$("h1").css("text-decoration", "underline");
+					$("#jQuery").hide();
+					$("#signInButton").css("background", "url('submit.png')");
+					$("#signInButton").css("height", "41px");
+					$("#signInButton").css("width", "196px");
+					$("#resetButton").css("background", "url('reset.jpg')");
+					$("#resetButton").css("height", "41px");
+					$("#resetButton").css("width", "196px");
+					$("#add").css("background", "url('add.jpg')");
+					$("#add").css("height", "41px");
+					$("#add").css("width", "179px");
+				});
+			});
+			/* This function checks to see if required fields are blank and gives an 
+			error message if they are.  Also tests the regular expressions for postal
+			codes and email addresses*/
+			function validate()
+			{
+				// declare and initialize variables for regular expressions
+				
+				var postalCodeRegex = /^[A-Za-z][0-9][A-Za-z]\s[0-9][A-Za-z][0-9]$/;
+				//var emailAddressRegex = /^(.)+\@(.)+(\.)(ca|com|gov|net|org)$/;
+				
+				
+				var errorMessage = ""; // variable to hold the error message
+				var isGood = true; // boolean variable for validation
+				var focusOrder = false; // beginning value for setting the focus
+				
+				arrays(); // call the array function 
+				
+				
+				// if the first name text box is blank	
+				if (varArray[0].value == "")
+				{	
+					errorMessage += "First Name field must be filled in.\n";
+					if (focusOrder == false) // if focusOrder has not been changed
+					{
+						focusOrder = true; 
+						varArray[0].focus(); // set focus to first name text box
+					}
+				}
+				if (varArray[1].value == "")
+				{
+					errorMessage += "Last Name field must be filled in.\n";
+					if (focusOrder == false) // if focusOrder has not been changed
+					{
+						focusOrder = true;
+						varArray[1].focus(); // set focus to last name text box
+					}
+				}
+				if (varArray[2].value == "")
+				{
+					errorMessage += "Street Address field must be filled in.\n";
+					if (focusOrder == false) // if focusOrder has not been changed
+					{
+						focusOrder = true;
+						varArray[2].focus(); // set focus to address text box
+					}
+				}
+				if (varArray[3].value == "")
+				{
+					errorMessage += "City name must be filled in.\n";
+					if (focusOrder == false) // if focusOrder has not been changed
+					{
+						focusOrder = true;
+						varArray[3].focus(); // set focus to city text box
+					}
+				}
+				if (varArray[3].value.length < 3)
+				{
+					errorMessage += "City name must be at least three letters long.\n";
+					if (focusOrder == false) // if focusOrder has not been changed
+					{
+						focusOrder = true;
+						varArray[3].focus(); // set focus to city text box
+					}
+				}
+				if (varArray[7].value == "selectProvince")
+				{
+					errorMessage += "Province must be selected.\n";
+					if (focusOrder == false) // if focusOrder has not been changed
+					{
+						focusOrder = true;
+						varArray[7].focus(); // set focus to province combo box
+					}
+				}
+				if (varArray[4].value != "")
+				{
+					/* test the postal code entered against the postal code regular 
+					expression by using the regEx function in the library.js file*/
+					var isGood = regEx(postalCodeRegex, varArray[4].value);
+					
+					// if the postal code does not match the regular expressions
+					if (!isGood)
+					{
+						errorMessage += "Postal Code must be in the format A1A 1A1.\n";
+						if (focusOrder == false) // if focusOrder has not been changed
+						{
+							focusOrder = true;
+							varArray[4].focus(); // set focus to postal code text box
+						}
+					}
+				}
+				if (varArray[4].value == "")
+				{
+					errorMessage += "Postal Code field must be filled in.\n";
+					if (focusOrder == false) // if focusOrder has not been changed
+					{
+						focusOrder = true;
+						varArray[4].focus(); // set focus to postal code text box
+					}
+				}
+				if (varArray[9].value == "")
+				{
+					errorMessage += "Order can not be empty.\n";
+					if (focusOrder == false) // if focusOrder has not been changed
+					{
+						focusOrder = true;
+						varArray[8].focus(); // set focus to toy selection list box
+					}
+				}
+				// if all fields are not valid
+				if (errorMessage != "")
+				{
+					isGood = false; // Set validation boolean to false
+					alert(errorMessage); // if there is an error message, display alert
+				}
+				return isGood; // return validation boolean value
+			}
+			
+			/* this function adds items to the customer's order
+			after validating the toySelection list box and quantity text box */
+			function addToOrder()
+			{
+				// declare variables for the addToOrder function
+				var orderErrorMessage = "";
+				var isValid = true;
+				var focus = false;
+				var quantity = (varArray[6].value);
+				var toys=varArray[8].value;
+				
+				// call arrays function
+				arrays();
+				
+				// if the quantity entered is not a number
+				if (isNaN(quantity))
+				{
+					orderErrorMessage += "Quantity must be a number.\n";
+					
+					if (focus == false) // if focusOrder has not been changed
+					{
+						focus = true;
+						varArray[6].focus(); // set focus to quantity text box
+					}
+				}
+				
+				// if the quantity entered is zero or less
+				if (quantity <= 0)
+				{
+					orderErrorMessage += "Quantity must be greater than zero.\n";
+					
+					if (focus == false) // if focusOrder has not been changed
+					{
+						focus = true;
+						varArray[6].focus(); // set focus to quantity text box
+					}
+				}
+				
+				// if the toy selection has not been moved off the default
+				if (toys == "selectToy")
+				{
+					orderErrorMessage += "Toy must be selected.\n";
+					//document.myForm.addButon.enabled = false;
+					if (focus == false) // if focusOrder has not been changed
+					{
+						focus = true;
+						varArray[8].focus(); // set focus to province combo box
+					}
+				}
+				
+				// if the fields are not valid
+				if (orderErrorMessage != "")
+				{					
+					isValid = false; // Set validation boolean to false
+					alert(orderErrorMessage);
+				}
+				
+				// if the order information is valid
+				else if (orderErrorMessage == "")
+				{
+					// add order to orderSummary
+					orderSummary = varArray[6].value + " " + varArray[8].value;
+					alert(orderSummary + " added to order.");
+					
+					// declare variables for order calculations and display
+					var price = 0;
+					var displayTotal = document.getElementById("total");
+					var phpOrderTotal = document.getElementById("phpOrderTotal");
+					var textOrder = document.getElementById("textOrder");
+					var orderTotal = 0;
+					
+					// price and orderTotal dependent on selection and quantity entered
+					if (toys == "Dolls")
+					{
+						price = 15;
+						orderTotal += quantity * price;
+					}
+					else if (toys == "Trains")
+					{
+						price = 10;			
+						orderTotal += quantity * price;
+					}
+					else if (toys == "Books")
+					{
+						price = 5;
+						orderTotal += quantity * price;
+					}
+					else if (toys == "Dressup Outfits")
+					{
+						price = 20;
+						orderTotal += quantity * price;
+					}
+					else if (toys == "Board Games")
+					{
+						price = 25;
+						orderTotal += quantity * price;
+					}
+					// print orderSummary to text area
+					varArray[9].value += orderSummary + " at $" + price + " per item.\n";
+					
+					// display the total price of the order
+					displayTotal.innerHTML = "<b>Total Price: $" + orderTotal + "</b>";	
+					
+					// orderTotal given to hidden field used to transfer to php
+					phpOrderTotal.value = orderTotal;
+					
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="page">
+			<form name="myForm" action = "index.php" method = "POST" onsubmit="return validate();">
+			
+				<fieldset><h1>Enter Customer Information</h1>
+				
+				<!-- First Name text box -->
+				<p>First Name:*<input type="text" id="textbox0" name="firstName" value="" 
+				onBlur="pascal(); trimInput();" /></p>
+				
+				<!-- Last Name text box -->
+				<p>Last Name:*<input type="text" id="textbox1" name="lastName" 
+				onBlur="pascal(); trimInput();" /></p>
+				
+				<!-- Street Address text box -->
+				<p>Street Address:*<input type="text" id="textbox2" name="streetName" 
+				onBlur="pascal(); trimInput();" /></p>
+				
+				<!-- City text box -->
+				<p>City*:<input type="text" id="textbox3" name="cityName" 
+				onBlur="pascal(); trimInput();" /></p>
+				
+				<!-- Province drop down menu -->
+				<p>Province*:
+				<select size = "1" id="provinceSelection" name="provinceName">
+					<option value="selectProvince">Select Your Province</option>
+					<option value="Alberta">Alberta</option>
+					<option value="British Columbia">British Columbia</option>
+					<option value="Manitoba">Manitoba</option>
+					<option value="New Brunswick">New Brunswick</option>
+					<option value="Newfoundland">Newfoundland</option>
+					<option value="Northwest Territories">Northwest Territories</option>
+					<option value="Nova Scotia">Nova Scotia</option>
+					<option value="Nunavut">Nunavut</option>
+					<option value="Ontario">Ontario</option>
+					<option value="Prince Edward Island">Prince Edward Island</option>
+					<option value="Quebec">Quebec</option>
+					<option value="Saskatchewan">Saskatchewan</option>
+					<option value="Yukon">Yukon</option>
+				</select></p>
+				
+				<!-- Postal Code text box -->
+				<p>Postal Code:*<input type="text" id="textbox4" name="postalCodeName" 
+				onBlur="upperCase(postalCodeName); trimInput();" />eg. A1A 1A1</p>
+								
+				<!-- Order Information -->
+				<fieldset>
+					<p><label>Create an Order: </label><br />
+					<select size = "6" id = "toySelection" name="toyName">
+						<option value="selectToy" selected = "selected" >Select A Toy</option>
+						<option value = "Dolls" onclick="selection();">Dolls</option>
+						<option value = "Trains" onclick="selection();">Trains</option>
+						<option value = "Books" onclick="selection();">Books</option>
+						<option value = "Dressup Outfits" onclick="selection();">Outfits</option>
+						<option value = "Board Games" onclick="selection();">Board Games</option>
+					</select><label id="cost">&nbsp;&nbsp;</label><br />
+					<br />
+					<label>Quantity: </label>
+					<input type = "text" id = "textbox6" name="quantityName" onBlur ="trimInput();"/></p>
+					<p><input type = "button" id="add" name="addButton" value="Add to Order" onclick="addToOrder();" /></p>
+					<p><legend>Order Overview: </legend><textarea rows="15" cols = "35" id="orderTextArea" name="orderTextAreaName" value=""></textarea></p>
+					<label id="total">&nbsp;&nbsp;</label><br />
+					<!-- hidden inputs used to transfer information to php -->
+					<input type = "hidden" id="phpOrderTotal" name = "phpOrderTotal" />
+					<input type = "hidden" id = "textOrder" name = "textOrder" />
+				</fieldset>
+				<!-- Submit button -->
+				<p><input type="submit" id="signInButton" onclick="upperCase(postalCodeName); trimInput();"   />&nbsp;<input type="reset" id="resetButton" /></p>
+				
+				<!-- jQuery button -->
+				<p><input type="button" id="jQuery" name="cssButton" value="Why Is This Form So Boring?" /></p>
+				
+				<!-- Reset button -->
+				
+				
+			</form>
+		</div>
+	</body>
+</html>
